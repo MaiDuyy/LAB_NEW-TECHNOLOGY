@@ -3,11 +3,25 @@ import db from "../db/db.js";
 
 const router = express.Router();
 
-// Hiển thị danh sách sản phẩm
+// Hiển thị danh sách + tìm kiếm sản phẩm
 router.get("/", async(req, res) => {
-    const [rows] = await db.query("SELECT * FROM products");
-    res.render("products", { products: rows });
+    const { q } = req.query;
+
+    let sql = "SELECT * FROM products";
+    let params = [];
+
+    if (q) {
+        sql += " WHERE name LIKE ?";
+        params.push(`%${q}%`);
+    }
+
+    const [rows] = await db.query(sql, params);
+    res.render("products", {
+        products: rows,
+        q: q || ""
+    });
 });
+
 
 // Thêm sản phẩm
 router.post("/add", async(req, res) => {
@@ -46,5 +60,7 @@ router.post("/edit/:id", async(req, res) => {
     );
     res.redirect("/");
 });
+
+// Tim kiếm sản phẩm theo LIKE
 
 export default router;
