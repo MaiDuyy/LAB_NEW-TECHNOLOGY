@@ -1,0 +1,20 @@
+{
+  "name": "phammaiduy_22002115_lab1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lab1": "node node-fundamentals_lab1/app.js",
+    "lab2": "node node-fs-npm_lab2/app.js",
+    "lab3": "node student-activity-logger_lab3/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "events": "^3.3.0",
+    "lodash": "^4.17.21"
+  }
+}
