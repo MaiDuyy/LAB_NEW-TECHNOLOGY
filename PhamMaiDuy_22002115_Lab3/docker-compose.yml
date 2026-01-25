@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # Node.js Application
+  app:
+    build: .
+    container_name: node-shop-app
+    ports:
+      - "${NODE_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=${DB_USER:-root}
+      - DB_PASSWORD=${DB_PASSWORD:-root123}
+      - DB_NAME=${DB_NAME:-shopdb}
+      - SESSION_SECRET=${SESSION_SECRET:-your-secret-key-change-this}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - shop-network
+    restart: unless-stopped
+    volumes:
+      - ./:/app
+      - /app/node_modules
+
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: node-shop-mysql
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-root123}
+      - MYSQL_DATABASE=${DB_NAME:-shopdb}
+      - MYSQL_USER=${DB_USER:-shopuser}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-root123}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - shop-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 5
+      interval: 10s
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  shop-network:
+    driver: bridge
